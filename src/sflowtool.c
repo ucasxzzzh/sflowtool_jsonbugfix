@@ -3967,6 +3967,8 @@ static void readCounters_adaptors(SFSample *sample)
       sf_logf_U32(sample, "ifIndex", ifindex);
       num_macs = getData32(sample);
       sf_logf_U32(sample, "MACs", num_macs);
+      putchar(','); //xzh_fix
+      json_indent();  //xzh_fix
       json_start_ar("mac_list");
       for(j = 0; j < num_macs; j++) {
 	if(j > 0)
@@ -3981,6 +3983,8 @@ static void readCounters_adaptors(SFSample *sample)
       }
       json_end_ar(); /* end mac_list */
       json_end_ob(); /* end adaptor */
+      if(i!=num_adaptors-1) //xzh_fix
+       putchar(','); //xzh_fix
     }
     json_end_ar(); /* end adaptor_list */
   }
@@ -5026,7 +5030,7 @@ static void readSFlowDatagram(SFSample *sample)     //xzhtest
   /* log some datagram info */
   sfConfig.currentFieldScope = SFSCOPE_DATAGRAM;
   sf_logf(sample, NULL, "datagramSourceIP", printAddress(&sample->sourceIP, &buf));
-  sf_logf_U32(sample, "datagramSizeddddd", sample->rawSampleLen);
+  sf_logf_U32(sample, "datagramSize", sample->rawSampleLen);
   sf_logf_U32(sample, "unixSecondsUTC", sample->readTimestamp);
   sf_logf(sample, NULL, "localtime", printTimestamp(sample->readTimestamp, &buf));
   if(sample->pcapTimestamp) {
@@ -5107,8 +5111,12 @@ static void readSFlowDatagram(SFSample *sample)     //xzhtest
 	default: receiveError(sample, "unexpected sample type", YES); break;
 	}
       }
-      if(sfConfig.outputFormat == SFLFMT_JSON)
-	json_end_ob();
+      if(sfConfig.outputFormat == SFLFMT_JSON){
+        json_end_ob();
+        if(samp != samplesInPacket-1) //xzh_fix
+          putchar(','); //xzh_fix
+      }
+	
       else
 	sf_log(sample,"endSample   ----------------------\n");
     }
