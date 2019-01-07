@@ -682,7 +682,7 @@ static int SFStr_append(SFStr *sb, char *str) {
   int slen = strlen(str);
   int copylen = strlen(str);
   if((sb->len + copylen) >= sb->cap)
-    copylen = sb->cap - sb->len - 1;
+    copylen = sb->cap - sb->len - 1;  //cap初始化2048
   if(copylen > 0) {
     memcpy(sb->str + sb->len, str, copylen);
     sb->len += copylen;
@@ -779,7 +779,7 @@ static int SFStr_append_array32(SFStr *sb, uint32_t *array32, int n, int net_byt
 
 static int SFStr_append_U32(SFStr *sb, char *fmt, uint32_t val32) {
   char ibuf[200];
-  sprintf(ibuf, fmt, val32);
+  sprintf(ibuf, fmt, val32);  //把val32写入ibuf
   return SFStr_append(sb, ibuf);
 }
 
@@ -907,8 +907,8 @@ static char *printDataSource(uint32_t ds_class, uint32_t ds_index, SFStr *sb) {
   return SFStr_str(sb);
 }
 
-static char *printOutputPort_v2v4(uint32_t outputPort, SFStr *sb) {
-  SFStr_init(sb);
+static char *printOutputPort_v2v4(uint32_t outputPort, SFStr *sb) { //传进来sb是空的
+  SFStr_init(sb); //初始化SFStr类型的sb
   if(outputPort & 0x80000000) {
     uint32_t numOutputs = outputPort & 0x7fffffff;
     if(numOutputs > 0)
@@ -916,7 +916,7 @@ static char *printOutputPort_v2v4(uint32_t outputPort, SFStr *sb) {
     else
       SFStr_append(sb, "multiple >1");
   }
-  else SFStr_append_U32(sb, "%u", outputPort);
+  else SFStr_append_U32(sb, "%u", outputPort);  //u是无符号整数
   return SFStr_str(sb);
 }
 
@@ -3654,8 +3654,12 @@ static void readFlowSample(SFSample *sample, int expanded)
       default: skipTLVRecord(sample, tag, length, "flow_sample_element"); break;
       }
       lengthCheck(sample, "flow_sample_element", start, length);
-      if(sfConfig.outputFormat == SFLFMT_JSON)
-	json_end_ob();
+      if(sfConfig.outputFormat == SFLFMT_JSON){
+         json_end_ob();
+         if(el!=num_elements-1) //xzh_fix
+          putchar(','); //xzh_fix
+      }
+	       
     }
   }
   lengthCheck(sample, "flow_sample", sampleStart, sampleLength);
