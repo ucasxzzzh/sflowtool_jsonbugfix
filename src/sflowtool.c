@@ -1612,7 +1612,7 @@ static void decodeIPV4(SFSample *sample)
     sample->s.dcd_ipProtocol = ip.protocol;
     sample->s.dcd_ipTos = ip.tos;
     sample->s.dcd_ipTTL = ip.ttl;
-    sf_logf_U32(sample, "ip.tot_len", ntohs(ip.tot_len));
+    sf_logf_U32(sample, "ip_tot_len", ntohs(ip.tot_len));
     /* Log out the decoded IP fields */
     sf_logf(sample, NULL, "srcIP", printAddress(&sample->s.ipsrc, &buf));
     sf_logf(sample, NULL, "dstIP", printAddress(&sample->s.ipdst, &buf));
